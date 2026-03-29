@@ -1,42 +1,14 @@
 import { motion } from 'framer-motion'
+import { Activity, MessageSquare, Calendar, ArrowUpRight, CheckCircle } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
-import { 
-  Activity, 
-  MessageSquare, 
-  Calendar, 
-  TrendingUp, 
-  CheckCircle,
-  RefreshCw 
-} from 'lucide-react'
+import { es } from 'date-fns/locale'
 import { mockActivities } from '../lib/mockData'
 
-const activityConfig = {
-  message: { 
-    icon: MessageSquare, 
-    color: 'text-green-500', 
-    bg: 'bg-green-100' 
-  },
-  appointment: { 
-    icon: Calendar, 
-    color: 'text-blue-500', 
-    bg: 'bg-blue-100' 
-  },
-  lead_moved: { 
-    icon: TrendingUp, 
-    color: 'text-purple-500', 
-    bg: 'bg-purple-100' 
-  },
-  conversion: { 
-    icon: CheckCircle, 
-    color: 'text-emerald-500', 
-    bg: 'bg-emerald-100' 
-  },
-  calendar_sync: { 
-    icon: RefreshCw, 
-    color: 'text-orange-500', 
-    bg: 'bg-orange-100' 
-  }
+const activityIcons = {
+  message: { icon: MessageSquare, color: 'text-green-600', bg: 'bg-green-100' },
+  appointment: { icon: Calendar, color: 'text-blue-600', bg: 'bg-blue-100' },
+  lead_moved: { icon: ArrowUpRight, color: 'text-orange-600', bg: 'bg-orange-100' },
+  conversion: { icon: CheckCircle, color: 'text-emerald-600', bg: 'bg-emerald-100' }
 }
 
 export function ActivityFeed() {
@@ -44,52 +16,55 @@ export function ActivityFeed() {
     <motion.div
       initial={{ y: 20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      transition={{ delay: 0.5, duration: 0.4 }}
-      className="card"
+      transition={{ delay: 0.45 }}
+      className="bg-white rounded-xl sm:rounded-2xl border border-gray-100 shadow-sm overflow-hidden"
     >
-      <div className="flex items-center justify-between mb-6">
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-gray-100">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/25">
-            <Activity className="w-5 h-5 text-white" />
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-orange-100 flex items-center justify-center">
+            <Activity className="w-4 h-4 sm:w-5 sm:h-5 text-orange-600" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">Atividades Recentes</h2>
-            <p className="text-sm text-gray-500">Atualizações em tempo real</p>
+            <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Actividad Reciente</h3>
+            <p className="text-xs sm:text-sm text-gray-500">Últimas actualizaciones</p>
           </div>
         </div>
-        <button className="text-sm text-primary-600 hover:text-primary-700 font-medium transition-colors">
-          Ver todas
+        <button className="text-xs sm:text-sm text-primary-600 hover:text-primary-700 font-medium">
+          Ver todo
         </button>
       </div>
 
-      <div className="space-y-0 max-h-[300px] overflow-y-auto pr-2">
-        {mockActivities.map((activity, index) => {
-          const config = activityConfig[activity.type as keyof typeof activityConfig] || activityConfig.message
-          const Icon = config.icon
-          const timeAgo = formatDistanceToNow(new Date(activity.created_at), {
-            locale: ptBR,
-            addSuffix: true
-          })
+      {/* Activity list */}
+      <div className="max-h-[280px] sm:max-h-[350px] overflow-y-auto">
+        <div className="p-3 sm:p-4 space-y-3 sm:space-y-4">
+          {mockActivities.map((activity, index) => {
+            const config = activityIcons[activity.type]
+            const Icon = config.icon
+            const timeAgo = formatDistanceToNow(new Date(activity.created_at), { 
+              addSuffix: true,
+              locale: es 
+            })
 
-          return (
-            <motion.div
-              key={activity.id}
-              initial={{ x: -20, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: index * 0.05 }}
-              className="activity-item"
-            >
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${config.bg}`}>
-                <Icon className={`w-4 h-4 ${config.color}`} />
-              </div>
-              
-              <div className="flex-1 min-w-0">
-                <p className="text-sm text-gray-700">{activity.description}</p>
-                <p className="text-xs text-gray-400 mt-0.5">{timeAgo}</p>
-              </div>
-            </motion.div>
-          )
-        })}
+            return (
+              <motion.div
+                key={activity.id}
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 0.5 + index * 0.05 }}
+                className="flex items-start gap-3"
+              >
+                <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full ${config.bg} flex items-center justify-center flex-shrink-0`}>
+                  <Icon className={`w-3 h-3 sm:w-4 sm:h-4 ${config.color}`} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs sm:text-sm text-gray-700 line-clamp-2">{activity.description}</p>
+                  <p className="text-[10px] sm:text-xs text-gray-400 mt-1">{timeAgo}</p>
+                </div>
+              </motion.div>
+            )
+          })}
+        </div>
       </div>
     </motion.div>
   )

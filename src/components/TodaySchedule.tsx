@@ -1,110 +1,93 @@
 import { motion } from 'framer-motion'
-import { format, parseISO } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
-import { Clock, User, FileText, CheckCircle2, AlertCircle, Calendar } from 'lucide-react'
+import { Clock, User, FileText, Calendar } from 'lucide-react'
+import { format } from 'date-fns'
+import { es } from 'date-fns/locale'
 import { mockAppointments } from '../lib/mockData'
 
-const appointmentTypeColors = {
-  consultation: { bg: 'bg-primary-100', text: 'text-primary-700', label: 'Consulta' },
-  followup: { bg: 'bg-purple-100', text: 'text-purple-700', label: 'Retorno' },
-  procedure: { bg: 'bg-orange-100', text: 'text-orange-700', label: 'Procedimento' },
-  other: { bg: 'bg-gray-100', text: 'text-gray-700', label: 'Outro' }
+const statusColors = {
+  completed: { bg: 'bg-green-100', text: 'text-green-700', dot: 'bg-green-500' },
+  confirmed: { bg: 'bg-blue-100', text: 'text-blue-700', dot: 'bg-blue-500' },
+  scheduled: { bg: 'bg-gray-100', text: 'text-gray-700', dot: 'bg-gray-400' },
+  cancelled: { bg: 'bg-red-100', text: 'text-red-700', dot: 'bg-red-500' }
 }
 
-const statusIcons = {
-  completed: { icon: CheckCircle2, color: 'text-emerald-500' },
-  confirmed: { icon: CheckCircle2, color: 'text-primary-500' },
-  scheduled: { icon: Clock, color: 'text-orange-500' },
-  cancelled: { icon: AlertCircle, color: 'text-red-500' }
+const statusLabels = {
+  completed: 'Completada',
+  confirmed: 'Confirmada',
+  scheduled: 'Programada',
+  cancelled: 'Cancelada'
 }
 
 export function TodaySchedule() {
-  const now = new Date()
-  const currentHour = now.getHours()
-
   return (
     <motion.div
       initial={{ y: 20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      transition={{ delay: 0.2, duration: 0.4 }}
-      className="card h-full"
+      transition={{ delay: 0.3 }}
+      className="bg-white rounded-xl sm:rounded-2xl border border-gray-100 shadow-sm overflow-hidden"
     >
-      <div className="flex items-center justify-between mb-6">
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-gray-100">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-lg shadow-primary-500/25">
-            <Calendar className="w-5 h-5 text-white" />
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-primary-100 flex items-center justify-center">
+            <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-primary-600" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">Agenda de Hoje</h2>
-            <p className="text-sm text-gray-500">
-              {format(now, "EEEE, d 'de' MMMM", { locale: ptBR })}
+            <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Agenda de Hoy</h3>
+            <p className="text-xs sm:text-sm text-gray-500">
+              {format(new Date(), "EEEE, d 'de' MMMM", { locale: es })}
             </p>
           </div>
         </div>
-        <span className="text-sm font-medium text-primary-600 bg-primary-50 px-3 py-1.5 rounded-full">
-          {mockAppointments.length} consultas
+        <span className="text-xs sm:text-sm text-primary-600 font-medium bg-primary-50 px-2 sm:px-3 py-1 rounded-full">
+          {mockAppointments.length} citas
         </span>
       </div>
 
-      <div className="space-y-1 max-h-[400px] overflow-y-auto pr-2">
-        {mockAppointments.map((appointment, index) => {
-          const startTime = parseISO(appointment.start_time)
-          const endTime = parseISO(appointment.end_time)
-          const appointmentHour = startTime.getHours()
-          const isPast = appointmentHour < currentHour
-          const isCurrent = appointmentHour === currentHour
-          const typeConfig = appointmentTypeColors[appointment.appointment_type]
-          const StatusIcon = statusIcons[appointment.status].icon
-          const statusColor = statusIcons[appointment.status].color
-
-          return (
-            <motion.div
-              key={appointment.id}
-              initial={{ x: -20, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: index * 0.05 }}
-              className={`timeline-slot ${isCurrent ? 'border-l-primary-500' : ''}`}
-            >
-              <div className={`flex items-start gap-4 p-3 rounded-xl transition-all ${
-                isCurrent ? 'bg-primary-50 border border-primary-200' : 
-                isPast ? 'opacity-60' : 'hover:bg-gray-50'
-              }`}>
+      {/* Timeline */}
+      <div className="max-h-[280px] sm:max-h-[350px] overflow-y-auto">
+        <div className="p-3 sm:p-4 space-y-2 sm:space-y-3">
+          {mockAppointments.map((appointment, index) => {
+            const status = statusColors[appointment.status]
+            const startTime = format(new Date(appointment.start_time), 'HH:mm')
+            const endTime = format(new Date(appointment.end_time), 'HH:mm')
+            
+            return (
+              <motion.div
+                key={appointment.id}
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 0.4 + index * 0.05 }}
+                className="flex gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer"
+              >
                 {/* Time */}
-                <div className="flex flex-col items-center min-w-[50px]">
-                  <span className={`text-sm font-bold ${isCurrent ? 'text-primary-600' : 'text-gray-900'}`}>
-                    {format(startTime, 'HH:mm')}
-                  </span>
-                  <span className="text-xs text-gray-400">
-                    {format(endTime, 'HH:mm')}
-                  </span>
+                <div className="flex flex-col items-center min-w-[40px] sm:min-w-[50px]">
+                  <span className="text-xs sm:text-sm font-semibold text-gray-900">{startTime}</span>
+                  <div className="w-px h-3 sm:h-4 bg-gray-200 my-1" />
+                  <span className="text-[10px] sm:text-xs text-gray-400">{endTime}</span>
                 </div>
 
-                {/* Content */}
+                {/* Card */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <User className="w-4 h-4 text-gray-400" />
-                    <span className="font-semibold text-gray-900 truncate">
-                      {appointment.patient_name}
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <User className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                      <span className="font-medium text-gray-900 text-sm truncate">{appointment.patient_name}</span>
+                    </div>
+                    <span className={`text-[10px] sm:text-xs font-medium px-2 py-0.5 rounded-full whitespace-nowrap ${status.bg} ${status.text}`}>
+                      {statusLabels[appointment.status]}
                     </span>
-                    <StatusIcon className={`w-4 h-4 ${statusColor}`} />
                   </div>
                   
-                  <div className="flex items-center gap-2">
-                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${typeConfig.bg} ${typeConfig.text}`}>
-                      {typeConfig.label}
-                    </span>
-                    {appointment.notes && (
-                      <span className="text-xs text-gray-500 truncate flex items-center gap-1">
-                        <FileText className="w-3 h-3" />
-                        {appointment.notes}
-                      </span>
-                    )}
+                  <div className="flex items-center gap-2 mt-1.5 sm:mt-2 text-xs sm:text-sm text-gray-500">
+                    <FileText className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                    <span className="truncate">{appointment.notes}</span>
                   </div>
                 </div>
-              </div>
-            </motion.div>
-          )
-        })}
+              </motion.div>
+            )
+          })}
+        </div>
       </div>
     </motion.div>
   )

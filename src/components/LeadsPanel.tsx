@@ -1,104 +1,100 @@
 import { motion } from 'framer-motion'
+import { MessageSquare, Phone, Clock, ChevronRight } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
-import { MessageSquare, Phone, Globe, UserPlus, ChevronRight } from 'lucide-react'
+import { es } from 'date-fns/locale'
 import { getTodaysLeads, funnelStages } from '../lib/mockData'
 
-const sourceIcons = {
-  whatsapp: { icon: MessageSquare, color: 'text-green-500', bg: 'bg-green-100' },
-  website: { icon: Globe, color: 'text-blue-500', bg: 'bg-blue-100' },
-  referral: { icon: UserPlus, color: 'text-purple-500', bg: 'bg-purple-100' },
-  other: { icon: Phone, color: 'text-gray-500', bg: 'bg-gray-100' }
-}
-
 export function LeadsPanel() {
-  const todaysLeads = getTodaysLeads()
+  const leads = getTodaysLeads()
 
   return (
     <motion.div
       initial={{ y: 20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      transition={{ delay: 0.3, duration: 0.4 }}
-      className="card h-full"
+      transition={{ delay: 0.35 }}
+      className="bg-white rounded-xl sm:rounded-2xl border border-gray-100 shadow-sm overflow-hidden"
     >
-      <div className="flex items-center justify-between mb-6">
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-gray-100">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-green-500/25">
-            <MessageSquare className="w-5 h-5 text-white" />
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-green-100 flex items-center justify-center">
+            <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">Leads de Hoje</h2>
-            <p className="text-sm text-gray-500">Mensagens recebidas via WhatsApp</p>
+            <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Leads WhatsApp</h3>
+            <p className="text-xs sm:text-sm text-gray-500">Mensajes de hoy</p>
           </div>
         </div>
-        <span className="text-sm font-medium text-green-600 bg-green-50 px-3 py-1.5 rounded-full">
-          {todaysLeads.length} novos
+        <span className="text-xs sm:text-sm text-green-600 font-medium bg-green-50 px-2 sm:px-3 py-1 rounded-full flex items-center gap-1">
+          <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+          {leads.length} nuevos
         </span>
       </div>
 
-      <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
-        {todaysLeads.length === 0 ? (
-          <div className="text-center py-8">
-            <MessageSquare className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-500">Nenhuma mensagem hoje ainda</p>
-          </div>
-        ) : (
-          todaysLeads.map((lead, index) => {
-            const sourceConfig = sourceIcons[lead.source]
-            const SourceIcon = sourceConfig.icon
-            const stage = funnelStages.find(s => s.id === lead.funnel_stage)
-            const timeAgo = formatDistanceToNow(new Date(lead.last_message_at || lead.created_at), {
-              locale: ptBR,
-              addSuffix: true
+      {/* Leads list */}
+      <div className="max-h-[280px] sm:max-h-[350px] overflow-y-auto">
+        <div className="divide-y divide-gray-50">
+          {leads.length === 0 ? (
+            <div className="p-8 text-center text-gray-500">
+              <MessageSquare className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+              <p>Sin mensajes nuevos hoy</p>
+            </div>
+          ) : (
+            leads.map((lead, index) => {
+              const stage = funnelStages.find(s => s.id === lead.funnel_stage)
+              const timeAgo = formatDistanceToNow(new Date(lead.last_message_at), { 
+                addSuffix: true,
+                locale: es 
+              })
+
+              return (
+                <motion.div
+                  key={lead.id}
+                  initial={{ x: -20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: 0.4 + index * 0.05 }}
+                  className="p-3 sm:p-4 hover:bg-gray-50 transition-colors cursor-pointer group"
+                >
+                  <div className="flex items-start gap-3">
+                    {/* Avatar */}
+                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white font-semibold text-xs sm:text-sm flex-shrink-0">
+                      {lead.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                    </div>
+
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="font-medium text-gray-900 text-sm truncate">{lead.name}</span>
+                        <span 
+                          className="text-[10px] sm:text-xs font-medium px-2 py-0.5 rounded-full whitespace-nowrap"
+                          style={{ backgroundColor: `${stage?.color}15`, color: stage?.color }}
+                        >
+                          {stage?.name}
+                        </span>
+                      </div>
+                      
+                      <p className="text-xs sm:text-sm text-gray-600 mt-1 line-clamp-1">{lead.last_message}</p>
+                      
+                      <div className="flex items-center gap-3 mt-2">
+                        <span className="text-[10px] sm:text-xs text-gray-400 flex items-center gap-1">
+                          <Clock className="w-3 h-3" />
+                          {timeAgo}
+                        </span>
+                        <span className="text-[10px] sm:text-xs text-gray-400 flex items-center gap-1 truncate">
+                          <Phone className="w-3 h-3 flex-shrink-0" />
+                          <span className="truncate">{lead.phone}</span>
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Action */}
+                    <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-primary-500 transition-colors flex-shrink-0 hidden sm:block" />
+                  </div>
+                </motion.div>
+              )
             })
-
-            return (
-              <motion.div
-                key={lead.id}
-                initial={{ x: 20, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: index * 0.05 }}
-                whileHover={{ scale: 1.01 }}
-                className="lead-card group"
-              >
-                <div className="flex items-start gap-3">
-                  {/* Source icon */}
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${sourceConfig.bg}`}>
-                    <SourceIcon className={`w-5 h-5 ${sourceConfig.color}`} />
-                  </div>
-
-                  {/* Content */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-1">
-                      <h4 className="font-semibold text-gray-900 truncate">{lead.name}</h4>
-                      <span className="text-xs text-gray-400 whitespace-nowrap ml-2">{timeAgo}</span>
-                    </div>
-                    
-                    <p className="text-sm text-gray-600 truncate mb-2">
-                      {lead.last_message}
-                    </p>
-
-                    <div className="flex items-center gap-2">
-                      <span 
-                        className="text-xs font-medium px-2 py-0.5 rounded-full"
-                        style={{ 
-                          backgroundColor: `${stage?.color}20`,
-                          color: stage?.color 
-                        }}
-                      >
-                        {stage?.name}
-                      </span>
-                      <span className="text-xs text-gray-400">{lead.phone}</span>
-                    </div>
-                  </div>
-
-                  {/* Arrow */}
-                  <ChevronRight className="w-5 h-5 text-gray-300 group-hover:text-primary-500 transition-colors" />
-                </div>
-              </motion.div>
-            )
-          })
-        )}
+          )}
+        </div>
       </div>
     </motion.div>
   )

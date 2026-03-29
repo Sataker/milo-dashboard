@@ -12,27 +12,32 @@ import { mockMetrics } from './lib/mockData'
 
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard')
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Sidebar */}
-      <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
+      <Sidebar 
+        activeTab={activeTab} 
+        onTabChange={setActiveTab} 
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
 
       {/* Main Content */}
-      <main className={`transition-all duration-300 ${sidebarCollapsed ? 'ml-20' : 'ml-64'}`}>
+      <main className="lg:ml-64 transition-all duration-300">
         {/* Header */}
-        <Header />
+        <Header onMenuToggle={() => setSidebarOpen(true)} />
 
         {/* Dashboard Content */}
-        <div className="p-8">
+        <div className="p-4 sm:p-6 lg:p-8">
           {/* Google Calendar Connect CTA */}
           <CalendarConnect />
 
           {/* KPI Metrics */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mt-4 sm:mt-6">
             <MetricCard
-              title="Pacientes Atendidos Hoje"
+              title="Pacientes Atendidos"
               value={mockMetrics.patients_seen}
               icon={Users}
               color="blue"
@@ -40,7 +45,7 @@ function App() {
               delay={0.1}
             />
             <MetricCard
-              title="Mensagens WhatsApp"
+              title="Mensajes WhatsApp"
               value={mockMetrics.messages_received}
               icon={MessageSquare}
               color="green"
@@ -48,7 +53,7 @@ function App() {
               delay={0.15}
             />
             <MetricCard
-              title="Leads Ativos"
+              title="Leads Activos"
               value={mockMetrics.active_leads}
               icon={TrendingUp}
               color="purple"
@@ -56,7 +61,7 @@ function App() {
               delay={0.2}
             />
             <MetricCard
-              title="Taxa de Conversão"
+              title="Tasa de Conversión"
               value={`${mockMetrics.conversion_rate}%`}
               icon={Target}
               color="orange"
@@ -66,7 +71,7 @@ function App() {
           </div>
 
           {/* Main Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mt-4 sm:mt-6">
             {/* Today's Schedule */}
             <TodaySchedule />
 
@@ -75,7 +80,7 @@ function App() {
           </div>
 
           {/* Bottom Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mt-4 sm:mt-6">
             {/* Sales Funnel - Takes 2 columns */}
             <div className="lg:col-span-2">
               <SalesFunnel />

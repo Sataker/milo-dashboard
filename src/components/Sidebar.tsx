@@ -1,127 +1,144 @@
 import { useState } from 'react'
-import { motion } from 'framer-motion'
-import {
-  LayoutDashboard,
-  Users,
-  Calendar,
-  MessageSquare,
-  TrendingUp,
+import { motion, AnimatePresence } from 'framer-motion'
+import { 
+  LayoutDashboard, 
+  Calendar, 
+  Users, 
+  MessageSquare, 
+  BarChart3, 
   Settings,
   LogOut,
-  ChevronLeft,
-  ChevronRight,
-  Stethoscope
+  Stethoscope,
+  X
 } from 'lucide-react'
 import { mockDoctor } from '../lib/mockData'
+
+const menuItems = [
+  { id: 'dashboard', icon: LayoutDashboard, label: 'Panel Principal' },
+  { id: 'calendar', icon: Calendar, label: 'Calendario' },
+  { id: 'patients', icon: Users, label: 'Pacientes' },
+  { id: 'messages', icon: MessageSquare, label: 'Mensajes' },
+  { id: 'analytics', icon: BarChart3, label: 'Estadísticas' },
+  { id: 'settings', icon: Settings, label: 'Configuración' },
+]
 
 interface SidebarProps {
   activeTab: string
   onTabChange: (tab: string) => void
+  isOpen?: boolean
+  onClose?: () => void
 }
 
-const navItems = [
-  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { id: 'schedule', label: 'Agenda', icon: Calendar },
-  { id: 'leads', label: 'Leads', icon: Users },
-  { id: 'messages', label: 'Mensagens', icon: MessageSquare },
-  { id: 'funnel', label: 'Funil', icon: TrendingUp },
-  { id: 'settings', label: 'Configurações', icon: Settings },
-]
-
-export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
-  const [collapsed, setCollapsed] = useState(false)
-
+export function Sidebar({ activeTab, onTabChange, isOpen = false, onClose }: SidebarProps) {
   return (
-    <motion.aside
-      initial={{ x: -20, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      transition={{ duration: 0.4, ease: 'easeOut' }}
-      className={`fixed left-0 top-0 h-screen bg-white border-r border-gray-100 z-50 flex flex-col transition-all duration-300 ${
-        collapsed ? 'w-20' : 'w-64'
-      }`}
-      style={{ boxShadow: '4px 0 24px rgba(0, 0, 0, 0.03)' }}
-    >
-      {/* Logo */}
-      <div className={`flex items-center gap-3 p-6 border-b border-gray-100 ${collapsed ? 'justify-center' : ''}`}>
-        <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-lg shadow-primary-500/25">
-          <Stethoscope className="w-5 h-5 text-white" />
-        </div>
-        {!collapsed && (
+    <>
+      {/* Mobile overlay */}
+      <AnimatePresence>
+        {isOpen && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.1 }}
-          >
-            <h1 className="text-xl font-bold text-gray-900">Milo</h1>
-            <p className="text-xs text-gray-500">Medical Dashboard</p>
-          </motion.div>
+            exit={{ opacity: 0 }}
+            onClick={onClose}
+            className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          />
         )}
+      </AnimatePresence>
+
+      {/* Sidebar */}
+      <motion.aside
+        initial={{ x: -280 }}
+        animate={{ x: isOpen ? 0 : -280 }}
+        transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+        className={`
+          fixed top-0 left-0 z-50 h-screen w-64 bg-white border-r border-gray-100 flex flex-col
+          lg:translate-x-0 lg:z-30
+        `}
+      >
+      {/* Logo */}
+      <div className="flex items-center justify-between gap-3 px-6 py-5 border-b border-gray-100">
+        <div className="flex items-center gap-3">
+          <motion.div 
+            whileHover={{ rotate: 10 }}
+            className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center"
+          >
+            <Stethoscope className="w-6 h-6 text-white" />
+          </motion.div>
+          <div>
+            <h1 className="font-bold text-gray-900 font-heading">Milo</h1>
+            <p className="text-xs text-gray-500">Panel Médico</p>
+          </div>
+        </div>
+        
+        {/* Close button - mobile only */}
+        <motion.button
+          whileTap={{ scale: 0.95 }}
+          onClick={onClose}
+          className="lg:hidden w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center"
+        >
+          <X className="w-4 h-4 text-gray-600" />
+        </motion.button>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
-        {navItems.map((item, index) => {
-          const Icon = item.icon
+      <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
+        {menuItems.map((item, index) => {
           const isActive = activeTab === item.id
-          
           return (
             <motion.button
               key={item.id}
               initial={{ x: -20, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               transition={{ delay: index * 0.05 }}
-              onClick={() => onTabChange(item.id)}
-              className={`w-full sidebar-link ${isActive ? 'active' : ''} ${collapsed ? 'justify-center px-3' : ''}`}
-              title={collapsed ? item.label : undefined}
+              onClick={() => {
+                onTabChange(item.id)
+                onClose?.()
+              }}
+              className={`
+                w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium
+                transition-all duration-200
+                ${isActive 
+                  ? 'bg-primary-50 text-primary-700' 
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                }
+              `}
             >
-              <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-white' : ''}`} />
-              {!collapsed && (
-                <span className={`font-medium ${isActive ? 'text-white' : ''}`}>
-                  {item.label}
-                </span>
+              <item.icon className={`w-5 h-5 ${isActive ? 'text-primary-600' : ''}`} />
+              <span>{item.label}</span>
+              {isActive && (
+                <motion.div
+                  layoutId="activeIndicator"
+                  className="ml-auto w-1.5 h-1.5 rounded-full bg-primary-600"
+                />
               )}
             </motion.button>
           )
         })}
       </nav>
 
-      {/* Collapse button */}
-      <button
-        onClick={() => setCollapsed(!collapsed)}
-        className="absolute -right-3 top-1/2 transform -translate-y-1/2 w-6 h-6 bg-white border border-gray-200 rounded-full flex items-center justify-center hover:bg-gray-50 transition-colors shadow-sm"
-      >
-        {collapsed ? (
-          <ChevronRight className="w-4 h-4 text-gray-500" />
-        ) : (
-          <ChevronLeft className="w-4 h-4 text-gray-500" />
-        )}
-      </button>
+      {/* Divider */}
+      <div className="mx-4 border-t border-gray-100" />
 
-      {/* Doctor profile */}
-      <div className={`p-4 border-t border-gray-100 ${collapsed ? 'flex justify-center' : ''}`}>
-        <div className={`flex items-center gap-3 ${collapsed ? 'flex-col' : ''}`}>
+      {/* User section */}
+      <div className="p-4">
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors"
+        >
           <img
             src={mockDoctor.avatar_url}
             alt={mockDoctor.name}
-            className="w-10 h-10 rounded-full object-cover ring-2 ring-primary-100"
+            className="w-10 h-10 rounded-full object-cover"
           />
-          {!collapsed && (
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-gray-900 truncate">
-                {mockDoctor.name}
-              </p>
-              <p className="text-xs text-gray-500 truncate">
-                {mockDoctor.specialty}
-              </p>
-            </div>
-          )}
-          {!collapsed && (
-            <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-              <LogOut className="w-4 h-4 text-gray-400" />
-            </button>
-          )}
-        </div>
+          <div className="flex-1 text-left min-w-0">
+            <p className="text-sm font-semibold text-gray-900 truncate">{mockDoctor.name}</p>
+            <p className="text-xs text-gray-500 truncate">{mockDoctor.specialty}</p>
+          </div>
+          <LogOut className="w-4 h-4 text-gray-400" />
+        </motion.button>
       </div>
     </motion.aside>
+    </>
   )
 }
