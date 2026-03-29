@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Users, MessageSquare, TrendingUp, Target } from 'lucide-react'
+import { ThemeProvider } from './context/ThemeContext'
 import { Sidebar } from './components/Sidebar'
 import { Header } from './components/Header'
 import { MetricCard } from './components/MetricCard'
@@ -10,12 +11,12 @@ import { SalesFunnel } from './components/SalesFunnel'
 import { ActivityFeed } from './components/ActivityFeed'
 import { mockMetrics } from './lib/mockData'
 
-function App() {
+function Dashboard() {
   const [activeTab, setActiveTab] = useState('dashboard')
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       {/* Sidebar */}
       <Sidebar 
         activeTab={activeTab} 
@@ -92,6 +93,14 @@ function App() {
         </div>
       </main>
     </div>
+  )
+}
+
+function App() {
+  return (
+    <ThemeProvider>
+      <Dashboard />
+    </ThemeProvider>
   )
 }
 

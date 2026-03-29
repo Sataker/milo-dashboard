@@ -16,28 +16,20 @@ interface MetricCardProps {
 
 const colorStyles = {
   blue: {
-    bg: 'bg-blue-50',
-    iconBg: 'bg-blue-100',
-    iconColor: 'text-blue-600',
-    accent: 'text-blue-600'
+    iconBg: 'bg-blue-100 dark:bg-blue-900/30',
+    iconColor: 'text-blue-600 dark:text-blue-400',
   },
   green: {
-    bg: 'bg-green-50',
-    iconBg: 'bg-green-100',
-    iconColor: 'text-green-600',
-    accent: 'text-green-600'
+    iconBg: 'bg-green-100 dark:bg-green-900/30',
+    iconColor: 'text-green-600 dark:text-green-400',
   },
   purple: {
-    bg: 'bg-purple-50',
-    iconBg: 'bg-purple-100',
-    iconColor: 'text-purple-600',
-    accent: 'text-purple-600'
+    iconBg: 'bg-purple-100 dark:bg-purple-900/30',
+    iconColor: 'text-purple-600 dark:text-purple-400',
   },
   orange: {
-    bg: 'bg-orange-50',
-    iconBg: 'bg-orange-100',
-    iconColor: 'text-orange-600',
-    accent: 'text-orange-600'
+    iconBg: 'bg-orange-100 dark:bg-orange-900/30',
+    iconColor: 'text-orange-600 dark:text-orange-400',
   }
 }
 
@@ -50,22 +42,22 @@ export function MetricCard({ title, value, icon: Icon, color, trend, delay = 0 }
       animate={{ y: 0, opacity: 1 }}
       transition={{ delay, duration: 0.4 }}
       whileHover={{ y: -2, boxShadow: '0 8px 30px rgba(0,0,0,0.08)' }}
-      className="bg-white rounded-2xl p-4 sm:p-6 border border-gray-100 shadow-sm"
+      className="bg-white dark:bg-gray-800 rounded-2xl p-4 sm:p-6 border border-gray-100 dark:border-gray-700 shadow-sm"
     >
       <div className="flex items-start justify-between">
         <div className="flex-1 min-w-0">
-          <p className="text-xs sm:text-sm text-gray-500 truncate">{title}</p>
-          <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mt-1">{value}</p>
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 truncate">{title}</p>
+          <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mt-1">{value}</p>
           
           {trend && (
-            <div className={`flex items-center gap-1 mt-2 text-xs sm:text-sm ${trend.isPositive ? 'text-green-600' : 'text-red-500'}`}>
+            <div className={`flex items-center gap-1 mt-2 text-xs sm:text-sm ${trend.isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-500 dark:text-red-400'}`}>
               {trend.isPositive ? (
                 <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4" />
               ) : (
                 <TrendingDown className="w-3 h-3 sm:w-4 sm:h-4" />
               )}
               <span className="font-medium">{trend.value}%</span>
-              <span className="text-gray-400 hidden sm:inline">vs ayer</span>
+              <span className="text-gray-400 dark:text-gray-500 hidden sm:inline">vs ayer</span>
             </div>
           )}
         </div>
@@ -76,12 +68,12 @@ export function MetricCard({ title, value, icon: Icon, color, trend, delay = 0 }
       </div>
 
       {/* Progress bar decoration */}
-      <div className="mt-3 sm:mt-4 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+      <div className="mt-3 sm:mt-4 h-1.5 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
         <motion.div 
           initial={{ width: 0 }}
           animate={{ width: '65%' }}
           transition={{ delay: delay + 0.3, duration: 0.8 }}
-          className={`h-full rounded-full bg-gradient-to-r from-primary-400 to-primary-600`}
+          className="h-full rounded-full bg-gradient-to-r from-primary-400 to-primary-600"
         />
       </div>
     </motion.div>
